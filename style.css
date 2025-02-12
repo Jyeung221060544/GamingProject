@@ -1,0 +1,51 @@
+*{
+  font-family: 'PT Sans', sans-serif;
+}
+
+html, body {
+  width: 100%;
+  margin:0px;
+  background-image: linear-gradient(45deg, rgb(38, 223, 127), rgb(65, 77, 251));
+  background-color: rgba(0,0,0,0);
+}
+
+.button{
+  background-color:#000501;
+  color:white;
+  border-radius:3px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left:15px;
+  padding-right:15px;
+  box-shadow:2px 2px 2px black;
+  cursor: pointer;
+}
+#Enter{
+  justify-content:center;
+  align-items:center;
+  display: flex;
+  flex-wrap:wrap;
+  position: relative;
+  margin:0;
+  padding:2px;
+  letter-spacing:3px;
+}
+
+#Enter > div{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#Enter p{
+  padding-left: 15px;
+  padding-right: 15px;
+  font-weight:bold;
+}
+
+#Enter input{
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: center;
+}
