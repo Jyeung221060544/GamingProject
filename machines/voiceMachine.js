@@ -56,7 +56,7 @@ async function init1() {
       
     }, {
         includeSpectrogram: true, // in case listen should return result.spectrogram
-        probabilityThreshold: 0.75,
+        probabilityThreshold: 0.60,
         invokeCallbackOnNoiseAndUnknown: true,
         overlapFactor: 0.50 // probably want between 0.5 and 0.75. More info in README
     });
