@@ -224,48 +224,113 @@ class Player{
   }
   
   //  For Controlling Using Voice
-  voiceInputs(){
-    let possibility = 0.4;
-    let voice_keys = Object.keys(this.voice_control);
-    let command;
+  // voiceInputs(){
+  //   let possibility = 0.6;
+  //   let voice_keys = Object.keys(this.voice_control);
+  //   let command;
 
-    if(this.voice_control != ""){
-      for(let i = 0; i < voice_keys.length; i++){
-        //  Gets the command stated with the greatest possibility    
-        if(this.voice_control[voice_keys[i]] > possibility){
-          possibility = this.voice_control[voice_keys[i]];
-          command = voice_keys[i];
-        }
-      }
+  //   if(this.voice_control != ""){
+  //     for(let i = 0; i < voice_keys.length; i++){
+  //       //  Gets the command stated with the greatest possibility    
+  //       if(this.voice_control[voice_keys[i]] > possibility){
+  //         possibility = this.voice_control[voice_keys[i]];
+  //         command = voice_keys[i];
+  //       }
+  //     }
   
-      //  Voice Command for Left And Right
-      if(command == "Left"){
-        this.direction = "left";
-        this.move();
-      }else if(command == "Right"){
-        this.direction = "right";
-        this.move();
-      } 
-    }
+  //     //  Voice Command for Left And Right
+  //     if(command == "Left"){
+  //       this.direction = "left";
+  //       this.move();
+  //     }else if(command == "Go Right"){
+  //       this.direction = "right";
+  //       this.move();
+  //     } 
+  //   }
 
-    //  Voice Command for Jumping
-    if(command == "Jump" && this.jumping == false && this.in_air == false){
-        this.status = "fall";
-        this.jumping = "true";
-    }
+  //   //  Voice Command for Jumping
+  //   if(command == "Jump" && this.jumping == false && this.in_air == false){
+  //       this.status = "fall";
+  //       this.jumping = "true";
+  //   }
 
-    if(this.skill_cooldown == 0 && this.jumping == false && this.in_air == false){
-      // for each control, check if pressed corresponding key
-      let actions = ["slash1", "slash2", "block1"];
-      let command2 = ["Hit 1", "Slash 2", "Block"];
+  //   if(this.skill_cooldown == 0 && this.jumping == false && this.in_air == false){
+  //     // for each control, check if pressed corresponding key
+  //     let actions = ["slash1", "slash2", "block1"];
+  //     let command2 = ["Hit", "Slash", "Block"];
       
-      for(let i = 0; i < 3; i++){
-        if(command == command2[i]){
+  //     for(let i = 0; i < 3; i++){
+  //       if(command == command2[i]){
+  //         this.status = actions[i];
+  //       }
+  //     }
+  //   }
+  // }
+  // //  For Controlling Using Voice
+  voiceInputs(){
+    // Make sure this.voice_control is the shared Voice object with numeric scores
+    if (!this.voice_control || typeof this.voice_control !== "object") return;
+
+    const IGNORE = new Set(["_background_noise_", "_unknown_", "Background Noise", "Unknown"]);
+
+    // Map Teachable Machine labels -> game commands
+    const LABEL_TO_CMD = {
+      // movement
+      "Left": "Left",
+      "Go Right": "Right",   // new label -> old expected command
+      // jump
+      "Jump": "Jump",
+      // skills (map to what your game expects)
+      "Hit": "Hit 1",        // new "Hit" should trigger old "Hit 1" (slash1)
+      "Slash": "Slash 2",    // new "Slash" should trigger old "Slash 2"
+      "Block": "Block",
+      // optional “stop/freeze” semantic
+      "Freeze": "Freeze"     // we’ll treat this as “don’t move” below
+    };
+
+    // pick highest-scoring non-ignored label above base threshold
+    let bestLabel = null;
+    let bestScore = 0.6;
+    for (const [label, raw] of Object.entries(this.voice_control)) {
+      if (IGNORE.has(label)) continue;
+      const score = Number(raw) || 0;
+      if (score > bestScore) { bestScore = score; bestLabel = label; }
+    }
+    if (!bestLabel) return;
+
+    const command = LABEL_TO_CMD[bestLabel];
+
+    // movement
+    if (command === "Left") {
+      this.direction = "left";
+      this.move();
+    } else if (command === "Right") {
+      this.direction = "right";
+      this.move();
+    } else if (command === "Freeze") {
+      // optional: explicitly cancel movement for a brief window
+      // do nothing (keeps current status), or:
+      // if (this.in_air === false && this.jumping === false) this.status = "idle";
+    }
+
+    // jump
+    if (command === "Jump" && this.jumping === false && this.in_air === false) {
+      this.status = "fall";
+      this.jumping = "true";
+    }
+
+    // skills
+    if (this.skill_cooldown == 0 && this.jumping == false && this.in_air == false) {
+      const actions  = ["slash1",  "slash2",  "block1"];
+      const command2 = ["Hit 1",   "Slash 2", "Block"];
+      for (let i = 0; i < actions.length; i++) {
+        if (command === command2[i]) {
           this.status = actions[i];
         }
       }
     }
   }
+
     
 
   // draw animation at player's current coords
