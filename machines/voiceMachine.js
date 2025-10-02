@@ -22,6 +22,7 @@ async function createModel() {
     return recognizer;
 }
 
+
 async function init1() {
     const recognizer = await createModel();
     const classLabels = recognizer.wordLabels(); // get class labels
@@ -29,6 +30,8 @@ async function init1() {
     for (let i = 0; i < classLabels.length; i++) {
         labelContainer.appendChild(document.createElement("div"));
     }
+
+    let lastUI = 0;
 
     // listen() takes two arguments:
     // 1. A callback function that is invoked anytime a word is recognized.
@@ -38,27 +41,29 @@ async function init1() {
         const scores = result.scores; // probability of prediction for each class
         // render the probability scores per class
 
-        //Voice Commands
-        let VoiceCommands = [];
-        let VoiceCommands_Score = [];
-  
+        // store numeric scores for game logic
         for (let i = 0; i < classLabels.length; i++) {
-            const classPrediction = classLabels[i] + ": " + result.scores[i].toFixed(2);
-            labelContainer.childNodes[i].innerHTML = classPrediction;
-            VoiceCommands.push(classLabels[i]);
-            VoiceCommands_Score.push(result.scores[i].toFixed(2));
+        Voice[classLabels[i]] = scores[i]; // NUMBER
         }
 
-      for(let i = 0; i < VoiceCommands.length; i++){
-        Voice[VoiceCommands[i]] = VoiceCommands_Score[i];
-      }
+        // update UI at most every 100ms
+        if (labelContainer) {
+            const now = performance.now();
+            if (now - lastUI > 100) {
+                for (let i = 0; i < classLabels.length; i++) {
+                    labelContainer.childNodes[i].innerHTML = `${classLabels[i]}: ${scores[i].toFixed(2)}`;
+                }
+                lastUI = now;
+            }
+        }
       // console.log(Voice);
       
     }, {
-        includeSpectrogram: true, // in case listen should return result.spectrogram
-        probabilityThreshold: 0.60,
+        includeSpectrogram: false, // in case listen should return result.spectrogram
+        probabilityThreshold: 0.50,
         invokeCallbackOnNoiseAndUnknown: true,
-        overlapFactor: 0.50 // probably want between 0.5 and 0.75. More info in README
+        overlapFactor: 0.75, // probably want between 0.5 and 0.75. More info in README
+        suppressionTime: 100               // ms between detections; default ~500
     });
 
     // Stop the recognition in 5 seconds.

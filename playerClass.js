@@ -290,7 +290,7 @@ class Player{
 
     // pick highest-scoring non-ignored label above base threshold
     let bestLabel = null;
-    let bestScore = 0.6;
+    let bestScore = 0.5;
     for (const [label, raw] of Object.entries(this.voice_control)) {
       if (IGNORE.has(label)) continue;
       const score = Number(raw) || 0;

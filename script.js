@@ -79,6 +79,7 @@ function preload(){
     game.state = init;
     gameloop();
 }
+
 document.onload = preload();
 
 // Controls the state of the game
@@ -88,8 +89,9 @@ function gameloop(){
     game.state();
   }
   game.update()
-  setTimeout(gameloop,10);
+  requestAnimationFrame(gameloop);
 }
+
 
 
 let players = [];
