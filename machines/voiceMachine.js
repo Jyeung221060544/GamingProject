@@ -4,7 +4,7 @@
 // the link to your model provided by Teachable Machine export panel
 const Voice = {};
 
-const URL = "https://teachablemachine.withgoogle.com/models/n91sG1cDD/";
+const URL = "https://teachablemachine.withgoogle.com/models/gyiB0G4Lz/";
 
 async function createModel() {
     const checkpointURL = URL + "model.json"; // model topology
